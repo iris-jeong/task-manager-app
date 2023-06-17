@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Calendar | Task Manager</title>
+		<link rel="stylesheet" href="css/main.css" />
+		<link rel="stylesheet" href="css/month.css" />
+		<link rel="stylesheet" href="css/week.css" />
+	</head>
+	<body>
+		<div class="top-bar">
+			<button class="menu-btn" aria-label="Menu Toggle">
+				<img src="icons/menu.svg" alt="Menu Toggle" />
+			</button>
+		</div>
+		<!-- .top-bar -->
+
+		<nav class="nav">
+			<ul class="nav-list">
+				<li class="nav-item">
+					<a href="month.html">
+						<img src="icons/calendar.svg" alt="My Calendar" />
+						My Calendar
+					</a>
+				</li>
+				<li class="nav-item">
+					<a href="week.html">
+						<img src="icons/upcoming.svg" alt="Upcoming Tasks" />
+						Upcoming Tasks
+					</a>
+				</li>
+			</ul>
+		</nav>
+		<!-- .nav -->
+
+		<div class="content-container">
+			<div class="content-header">
+				<div class="header-date">
+					<span class="header-month"></span>
+					<span class="header-year"></span>
+				</div>
+				<!-- .header-date -->
+				<div class="header-nav">
+					<button type="button" id="today-button" title="">
+						Today
+					</button>
+					<button type="button" class="previous" title="Previous">
+						<img src="icons/left.svg" alt="Previous" />
+					</button>
+					<button type="button" class="next" title="Next">
+						<img src="icons/right.svg" alt="Next" />
+					</button>
+				</div>
+				<!-- .header-nav -->
+			</div>
+			<!-- .content-header -->
+
+			<div id="monthPage" class="month-page content-body">
+				<table class="calendar">
+					<thead>
+						<tr class="weekdays">
+							<th>SUN</th>
+							<th>MON</th>
+							<th>TUES</th>
+							<th>WED</th>
+							<th>THU</th>
+							<th>FRI</th>
+							<th>SAT</th>
+						</tr>
+					</thead>
+					<tbody class="calendar-body"></tbody>
+				</table>
+				<!-- .calendar -->
+
+				<div class="tasks">
+					<hr />
+					<div class="tasks-date"></div>
+					<form class="tasks-form">
+						<label for="new-task"></label>
+						<input
+							id="new-task"
+							name="new-task"
+							type="text"
+							placeholder="Wash the dishes..."
+						/>
+						<button type="submit">
+							<img src="icons/plus.svg" alt="Add task" />
+						</button>
+					</form>
+					<hr />
+					<ul class="tasks-list"></ul>
+					<hr />
+				</div>
+				<!-- .tasks -->
+			</div>
+			<!-- #monthPage .content-body -->
+
+			<div id="weekPage" class="week-page content-body content-hide">
+				<div id="weekdays">
+					<div class="weekday">
+						<span class="day">Sun</span>
+						<span class="weekdate"></span>
+					</div>
+					<div class="weekday">
+						<span class="day">Mon</span>
+						<span class="weekdate"></span>
+					</div>
+					<div class="weekday">
+						<span class="day">Tue</span>
+						<span class="weekdate"></span>
+					</div>
+					<div class="weekday">
+						<span class="day">Wed</span>
+						<span class="weekdate"></span>
+					</div>
+					<div class="weekday">
+						<span class="day">Thu</span>
+						<span class="weekdate"></span>
+					</div>
+					<div class="weekday">
+						<span class="day">Fri</span>
+						<span class="weekdate"></span>
+					</div>
+					<div class="weekday">
+						<span class="day">Sat</span>
+						<span class="weekdate"></span>
+					</div>
+				</div>
+				<!-- #weekdays -->
+				<hr />
+				<br />
+				<div class="upcoming-tasks"></div>
+				<!-- .upcoming-tasks -->
+			</div>
+			<!-- #weekPage .content-body -->
+		</div>
+		<!-- .content-container -->
+
+		<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+		<script src="js/navigation.js"></script>
+		<script src="js/Storage.js"></script>
+		<script src="js/Calendar.js"></script>
+		<script src="js/CalendarUI.js"></script>
+		<script>
+			let calendar = new Calendar();
+			let storage = new Storage();
+			let calendarUI = new CalendarUI(calendar, storage);
+			calendarUI.renderMonth();
+
+			$(document).ready(function () {
+				//Set the initial URL to "month".
+				let currentPage = "month.html";
+				showPage(currentPage);
+
+				//Get references to page containers.
+				const monthPage = document.getElementById("monthPage");
+				const weekPage = document.getElementById("weekPage");
+
+				//Get references to the navigation links.
+				const navLinks = $(".nav-item a");
+
+				//Show appropriate page upon user navigation.
+				navLinks.on("click", function (e) {
+					e.preventDefault();
+					const targetPage = $(this).attr("href");
+					currentPage = targetPage;
+					showPage(targetPage);
+				});
+			});
+
+			function showPage(targetPage) {
+				//Set the calendar back to today's date.
+				calendarUI.handleTodayClick();
+
+				let contentHeader = document.querySelector(".content-header");
+
+				if (targetPage === "month.html") {
+					monthPage.classList.remove("content-hide");
+					weekPage.classList.add("content-hide");
+					contentHeader.classList.remove("content-header-full");
+
+					// Add event listeners for the month page.
+					removeWeekEventListeners();
+					addMonthEventListeners();
+				} else if (targetPage === "week.html") {
+					calendarUI.renderWeek(calendar.today);
+					// console.log("CLICKED WEEK PAGE");
+					monthPage.classList.add("content-hide");
+					weekPage.classList.remove("content-hide");
+					contentHeader.classList.add("content-header-full");
+
+					//Add event listeners for the week page.
+					removeMonthEventListeners();
+					addWeekEventListeners();
+				}
+			}
+
+			// * * * * * * * * * * * * * * * * * * MONTH EVENT LISTENERS * * * * * * * * * * * * * * * * * *//
+			function addMonthEventListeners() {
+				//Initialize the previous button for the month page.
+				let prevBtn = document.querySelector(".previous");
+				let prevBtnImg =
+					document.querySelector(".previous").children[0];
+				$(prevBtnImg).attr("src", "icons/left.svg");
+				$(prevBtnImg).removeClass("disabled");
+				prevBtn.disabled = false;
+
+				//Go to previous month.
+				$(".previous").click(function () {
+					calendarUI.handlePrevMonthClick();
+				});
+				//Go to next month.
+				$(".next").click(function () {
+					calendarUI.handleNextMonthClick();
+				});
+				//Go to today.
+				$("#today-button").click(function () {
+					calendarUI.handleTodayClick();
+				});
+				//Show the appropriate tasks when user clicks on a day in the calendar.
+				$(".calendar-body").on("click", ".cell-day", function (e) {
+					const date = e.currentTarget.dataset.isoDate;
+					calendarUI.handleDayClick(date);
+				});
+				//Add new tasks.
+				$(".tasks-form").submit(function (e) {
+					e.preventDefault();
+
+					const taskDate = new Date(
+						$(this).siblings(".tasks-date").text()
+					);
+					const task = document
+						.querySelector("#new-task")
+						.value.trim();
+
+					if (task != "") {
+						calendarUI.handleAddTask(task, taskDate, "month");
+					}
+				});
+				//Handle task completion.
+				$(".tasks").on("click", ".task-input", function (e) {
+					const taskDate = new Date(
+						$(this).closest(".tasks").find(".tasks-date").text()
+					);
+
+					const taskId = e.currentTarget.dataset.id;
+
+					calendarUI.handleTaskCompletion(taskId, taskDate, "month");
+				});
+			}
+
+			function removeMonthEventListeners() {
+				// Remove the existing month event listeners.
+				$(".next").off("click");
+				$(".previous").off("click");
+				$(".calendar-body").off("click", ".cell-day");
+				$("#today-button").off("click");
+				$(".tasks-form").off("submit");
+				$(".tasks").off("click", ".task-input");
+			}
+
+			// * * * * * * * * * * * * * * * * * * WEEK EVENT LISTENERS * * * * * * * * * * * * * * * * * *//
+			function addWeekEventListeners() {
+				//Change icon when user hovers over add task button.
+				$(".add-btn")
+					.mouseenter(function () {
+						$(this)[0].children[0].setAttribute(
+							"src",
+							"icons/plus-hover.svg"
+						);
+					})
+					.mouseleave(function () {
+						$(this)[0].children[0].setAttribute(
+							"src",
+							"icons/plus.svg"
+						);
+					});
+
+				//On cancel button hover change icon.
+				$(".cancel-btn")
+					.mouseenter(function () {
+						$(this)[0].children[0].setAttribute(
+							"src",
+							"icons/cancel-hover.svg"
+						);
+					})
+					.mouseleave(function () {
+						$(this)[0].children[0].setAttribute(
+							"src",
+							"icons/cancel.svg"
+						);
+					});
+				//On submit button hover change icon.
+				$(".submit-btn")
+					.mouseenter(function () {
+						const submitBtn = $(this)[0];
+						const submitImg = $(this)[0].children[0];
+
+						if (!$(submitBtn).hasClass("disabled")) {
+							submitImg.setAttribute(
+								"src",
+								"icons/submit-hover.svg"
+							);
+						}
+					})
+					.mouseleave(function () {
+						const submitBtn = $(this)[0];
+						const submitImg = $(this)[0].children[0];
+						if (!$(submitBtn).hasClass("disabled")) {
+							submitImg.setAttribute("src", "icons/submit.svg");
+						}
+					});
+
+				//Show new task container display on add task button click.
+				$(".upcoming-tasks").on("click", ".add-btn", function (e) {
+					const addBtn = e.currentTarget;
+					const newTaskContainer = $(this)
+						.closest(".task-container")
+						.find(".new-task-container");
+
+					$(addBtn).addClass("hide");
+					$(newTaskContainer).addClass("show");
+				});
+
+				//Hide new task container display on cancel button click.
+				$(".upcoming-tasks").on("click", ".cancel-btn", function (e) {
+					const newTaskContainer = $(this).closest(
+						".new-task-container"
+					);
+					newTaskContainer.removeClass("show");
+					const addBtn = $(this)
+						.closest(".task-container")
+						.find(".add-btn");
+					$(addBtn).removeClass("hide");
+				});
+
+				//Toggle submit button
+				$(".task-input").on("input", function (e) {
+					const input = e.currentTarget;
+					const addBtn = $(this)
+						.closest(".new-task-container")
+						.find(".submit-btn")[0];
+					const addImg = $(addBtn).find("img")[0];
+
+					if (input.value.trim() === "") {
+						$(addBtn).addClass("disabled");
+						$(addImg).attr("src", "icons/submit-disabled.svg");
+					} else {
+						$(addBtn).removeClass("disabled");
+						$(addImg).attr("src", "icons/submit.svg");
+					}
+				});
+
+				//Handle adding the task on submit.
+				$(".task-container").submit(function (e) {
+					e.preventDefault();
+					const taskContainer = $(this).closest(".task-container");
+					const task = $(taskContainer).find("#new-task")[0].value;
+					const date = new Date(taskContainer[0].id);
+
+					calendarUI.handleAddTask(task, date, "week");
+					const input = $(taskContainer).find("#new-task")[0];
+					input.value = "";
+				});
+				let num = 0;
+				//Handle task completion.
+				$(".upcoming-tasks").on("click", "li", function (e) {
+					const taskLabel = e.currentTarget.children[1];
+					const taskInput = e.currentTarget.children[0];
+
+					if (e.target.nodeName === "LABEL") {
+						taskInput.checked = !taskInput.checked;
+					}
+					if (taskInput.checked) {
+						taskInput.checked = true;
+						taskLabel.classList.add("task-complete");
+					} else {
+						taskInput.checked = false;
+						taskLabel.classList.remove("task-complete");
+					}
+
+					const taskContainer = $(this).closest(".task-container")[0];
+					const taskId = $(e.currentTarget.children[0]).attr(
+						"data-id"
+					);
+					const taskDate = new Date(taskContainer.id);
+
+					calendarUI.handleTaskCompletion(taskId, taskDate, "week");
+					num++;
+				});
+				let prevBtn = document.querySelector(".previous");
+				let prevBtnImg =
+					document.querySelector(".previous").children[0];
+				$(prevBtnImg).attr("src", "icons/left-disabled.svg");
+				$(prevBtnImg).addClass("disabled");
+				prevBtn.disabled = true;
+
+				//Handle previous week toggle disable.
+				$(".header-nav").on("click", "button", function (e) {
+					calendarUI.toggleWeekNavigation();
+				});
+				//Handle previous week click.
+				$(".previous").click(function () {
+					calendarUI.handlePreviousWeekClick();
+				});
+				$(".next").click(function () {
+					calendarUI.handleNextWeekClick();
+				});
+				$("#today-button").click(function (e) {
+					calendarUI.handleTodayWeekClick();
+				});
+			}
+			function removeWeekEventListeners() {
+				$(".add-btn").off("mouseenter").off("mouseleave");
+				$(".cancel-btn").off("mouseenter").off("mouseleave");
+				$(".submit-btn").off("mouseenter").off("mouseleave");
+				$(".upcoming-tasks").off("click", ".add-btn");
+				$(".upcoming-tasks").off("click", ".cancel-btn");
+				$(".upcoming-tasks").off("click", "li");
+				$(".task-container").off("submit");
+				$("#weekPage").off("click", "li");
+				$(".next").off("click");
+				$(".previous").off("click");
+				$("#today-button").off("click");
+			}
+		</script>
+	</body>
+</html>

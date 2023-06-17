@@ -1,0 +1,151 @@
+#weekPage {
+	width: 75%;
+	margin-right: auto;
+	margin-left: auto;
+}
+#weekPage hr {
+	border: 0;
+	border-top: 0.9px solid #e8e8e8;
+	margin: 4px 0px;
+}
+
+/* Content */
+#weekdays {
+	width: 100%;
+	display: flex;
+	justify-content: space-around;
+}
+.weekday {
+	/* border: 1px solid #000; */
+	padding: 8px 12px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+.day {
+	font-size: 12px;
+	font-weight: 300;
+	color: #888;
+}
+.previous-weekdate {
+	color: #aeaeae;
+}
+.weekdate {
+	/* cursor: pointer; */
+	font-size: 15px;
+	font-weight: 500;
+
+	text-align: center;
+	line-height: 30px;
+	margin-top: 8px;
+	margin-left: auto;
+	border-radius: 50%;
+
+	width: 30px;
+	height: 30px;
+}
+.weekdate:hover {
+	/* background-color: #f5f5f5; */
+}
+.todays-date {
+	color: #3ba2dc;
+}
+.previous-date {
+	color: #888;
+	font-weight: normal;
+}
+.upcoming-tasks .tasks-list {
+	margin: 2px 0px;
+}
+.task-container {
+	padding-top: 30px;
+}
+.task-date {
+	display: flex;
+	align-items: center;
+	color: #808080;
+	font-size: 15px;
+	letter-spacing: 0.3px;
+}
+.task-date .date {
+	padding: 4px;
+}
+.task-date .weekday {
+	padding: 4px;
+}
+#has-task {
+	color: #585858;
+	font-weight: 500;
+}
+.tasks-list {
+	padding: 0px;
+}
+.add-btn {
+	display: flex;
+	align-items: center;
+	padding: 10px 0px;
+
+	cursor: pointer;
+	background: none;
+	border: none;
+}
+.add-btn:hover span {
+	color: #3ba2dc;
+}
+.add-btn > span {
+	margin-left: 8px;
+	font-size: 14px;
+	font-weight: 300;
+	letter-spacing: 0.3px;
+	color: #888888;
+}
+.hide {
+	display: none !important;
+}
+.show {
+	display: block !important;
+}
+/* New Task */
+.new-task-container {
+	width: 100%;
+	margin-top: 12px;
+	display: none;
+}
+.form-container {
+	border: 1px solid #000;
+	border-radius: 8px;
+	padding: 6px;
+}
+
+.new-form {
+	display: flex;
+	flex-direction: row;
+	border: 1px solid #efefef;
+	margin: 6px 0px;
+	padding: 4px 6px;
+	border-radius: 4px;
+}
+.new-form input {
+	border: none;
+	height: 36px;
+}
+.new-form:focus-within {
+	outline: 1px solid #efefef;
+}
+.new-form input:focus {
+	outline: none;
+}
+.btn-container {
+	/* padding: 8px 0px; */
+}
+.btn-container button {
+	border: none;
+	background: none;
+	padding-right: 8px;
+	padding-left: 0px;
+	cursor: pointer;
+}
+
+.disabled {
+	cursor: auto !important;
+}
